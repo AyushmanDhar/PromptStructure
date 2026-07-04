@@ -943,8 +943,18 @@ function renderSlots() {
 function saveToSlot() {
   if (blocks.length === 0) { showToast('No blocks to save'); return; }
   const slots = getSlotsData();
-  const emptyIdx = slots.findIndex((_, i) => i >= slots.length);
-  const targetIdx = slots.length < MAX_SLOTS ? slots.length : 0;
+  let targetIdx;
+  if (slots.length < MAX_SLOTS) {
+    targetIdx = slots.length;
+  } else {
+    const pick = prompt(`All ${MAX_SLOTS} slots are full. Which slot to overwrite? (1-${MAX_SLOTS})`);
+    if (!pick) return;
+    targetIdx = parseInt(pick, 10) - 1;
+    if (isNaN(targetIdx) || targetIdx < 0 || targetIdx >= MAX_SLOTS) {
+      showToast('Invalid slot number');
+      return;
+    }
+  }
   const name = prompt('Save name:', `Prompt ${new Date().toLocaleTimeString()}`);
   if (!name) return;
   const data = { name, blocks: JSON.parse(JSON.stringify(blocks)), counter: blockIdCounter, format };
